@@ -30,11 +30,8 @@ export function ChallangesContextProvider({ children }: ChallangesProviderProps)
   const [currentExperience, setCurrentExperience] = useState(0)
   const [challangesCompleted, setChallangesCompleted] = useState(0)
   const [activeChallange, setActiveChallange] = useState<Challange>(null)
-  const [experienceToNextLevel, setExperienceToNextLevel] = useState(0)
 
-  useEffect(() => {
-    setExperienceToNextLevel(Math.pow((level + 1) * 4, 2))
-  }, [level])
+  const experienceToNextLevel = Math.pow((level + 1) * 4, 2)
 
   function levelUp() {
     setLevel(level + 1)
