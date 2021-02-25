@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useEffect, useState } from "react"
+import { createContext, ReactNode, useContext, useEffect, useState } from "react"
 import challanges from '../../challenges.json'
 
 interface Challange {
@@ -16,14 +16,14 @@ interface ChallangesContextData {
   levelUp: () => void;
   startNewChallange: () => void;
   resetChallange: () => void;
-  finishChallange: () => void;
+  completeChallange: () => void;
 }
 
 interface ChallangesProviderProps {
   children: ReactNode;
 }
 
-export const ChallangesContext = createContext({} as ChallangesContextData)
+const ChallangesContext = createContext({} as ChallangesContextData)
 
 export function ChallangesContextProvider({ children }: ChallangesProviderProps) {
   const [level, setLevel] = useState(1)
@@ -35,7 +35,6 @@ export function ChallangesContextProvider({ children }: ChallangesProviderProps)
   useEffect(() => {
     setExperienceToNextLevel(Math.pow((level + 1) * 4, 2))
   }, [level])
-
 
   function levelUp() {
     setLevel(level + 1)
@@ -52,11 +51,18 @@ export function ChallangesContextProvider({ children }: ChallangesProviderProps)
     setActiveChallange(null)
   }
 
-  function finishChallange() {
-    const updatedExperience = currentExperience + activeChallange.amount
+  function completeChallange() {
+    if (!activeChallange) return
+
+    const { amount } = activeChallange
+
+    let updatedExperience = currentExperience + amount
+
     if (updatedExperience >= experienceToNextLevel) {
+      updatedExperience = updatedExperience - experienceToNextLevel
       levelUp()
     }
+
     setCurrentExperience(updatedExperience)
     setChallangesCompleted(challangesCompleted + 1)
     resetChallange()
@@ -73,9 +79,15 @@ export function ChallangesContextProvider({ children }: ChallangesProviderProps)
         levelUp,
         startNewChallange,
         resetChallange,
-        finishChallange,
+        completeChallange,
       }}>
       { children}
     </ChallangesContext.Provider>
   )
+}
+
+export function useChallanges(): ChallangesContextData {
+  const context = useContext(ChallangesContext);
+
+  return context;
 }
